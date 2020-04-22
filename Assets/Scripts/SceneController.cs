@@ -9,6 +9,7 @@ public class SceneController : MonoBehaviour
     [Header("Links")]
     [SerializeField] public GameObject ruleteObj;
 
+    [SerializeField] private Image _player;
     [SerializeField] private Text _timerText;
     [SerializeField] private Text _scoreText;
 
@@ -18,6 +19,20 @@ public class SceneController : MonoBehaviour
     [SerializeField] private float _scoreModifide;
 
     #endregion
+
+    public Color[] holeColors = new Color[]
+    {
+        Color.white,
+        Color.grey,
+        Color.red,
+        Color.green,
+        Color.blue,
+        Color.cyan,
+        Color.black,
+        Color.yellow
+    };
+
+    public bool[] holeActiveList;
 
     #region PRIVATE
 
@@ -32,6 +47,9 @@ public class SceneController : MonoBehaviour
     {
         _isPlayGame = true;
         _playerScore = 0;
+        holeActiveList = new bool[holeColors.Length];
+
+        _player.color = holeColors[Random.Range(0, holeColors.Length)];
         GenerateWorld();
         StartCoroutine(UpdateTimeUI());
     }
@@ -46,12 +64,16 @@ public class SceneController : MonoBehaviour
 
     private void GenerateWorld()
     {
-        for (int holeId = 0; holeId < ruleteObj.transform.childCount; holeId++) ruleteObj.transform.GetChild(holeId).GetComponent<HoleController>().CreateHole();
+        for (int holeId = 0; holeId < ruleteObj.transform.childCount; holeId++)
+        {
+            holeActiveList[holeId] = true;
+            ruleteObj.transform.GetChild(holeId).GetComponent<HoleController>().CreateHole(holeColors[holeId]);
+        }
     }
 
     private void GameEnd()
     {
-        Debug.LogError("Game End");
+        Debug.LogError("Game End / You Score : " + _playerScore);
 
         _isPlayGame = false;
 
@@ -73,6 +95,25 @@ public class SceneController : MonoBehaviour
         }
 
         GameEnd();
+    }
+
+    public void ReactivatePlayer(int holeId, bool isWin)
+    {
+        if (isWin) holeActiveList[holeId] = false;
+        _player.color = GetNewPlayerColor();
+    }
+
+    public Color GetNewPlayerColor()
+    {
+        for (int colorId = 0; colorId < holeColors.Length; colorId++)
+        {
+            if (holeActiveList[colorId])
+            {
+                return holeColors[colorId];
+            }
+        }
+
+        return Color.white;
     }
 
     #endregion

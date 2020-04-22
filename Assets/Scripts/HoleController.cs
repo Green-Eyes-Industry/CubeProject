@@ -8,13 +8,16 @@ public class HoleController : MonoBehaviour
     [HideInInspector] public bool isActive;
     [HideInInspector] public Color thisColor;
 
-    public void CreateHole(Color holeColor)
-    {
-        // Creating hole, set color and activate
+    private int _holeId;
+    private SceneController _sceneController;
 
+    public void CreateHole(int holeId, Color holeColor, SceneController sceneController)
+    {
         isActive = true;
+        _holeId = holeId;
         thisColor = holeColor;
         GetComponent<Image>().color = holeColor;
+        _sceneController = sceneController;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -26,9 +29,11 @@ public class HoleController : MonoBehaviour
 
     public void DisableHole(bool isWin)
     {
-        isActive = isWin;
+        _sceneController.ReactivatePlayer(_holeId, isWin);
+
         if (isWin)
         {
+            isActive = false;
             GetComponent<CircleCollider2D>().enabled = false;
             GetComponent<Image>().enabled = false;
         }

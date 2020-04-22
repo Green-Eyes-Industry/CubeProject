@@ -20,7 +20,7 @@ public class SceneController : MonoBehaviour
 
     #endregion
 
-    public Color[] holeColors = new Color[]
+    [HideInInspector] public Color[] holeColors = new Color[]
     {
         Color.white,
         Color.grey,
@@ -32,7 +32,7 @@ public class SceneController : MonoBehaviour
         Color.yellow
     };
 
-    public bool[] holeActiveList;
+    [HideInInspector] public bool[] holeActiveList;
 
     #region PRIVATE
 
@@ -67,7 +67,7 @@ public class SceneController : MonoBehaviour
         for (int holeId = 0; holeId < ruleteObj.transform.childCount; holeId++)
         {
             holeActiveList[holeId] = true;
-            ruleteObj.transform.GetChild(holeId).GetComponent<HoleController>().CreateHole(holeColors[holeId]);
+            ruleteObj.transform.GetChild(holeId).GetComponent<HoleController>().CreateHole(holeId, holeColors[holeId], this);
         }
     }
 

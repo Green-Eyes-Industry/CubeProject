@@ -73,6 +73,16 @@ public class SceneController : MonoBehaviour
         }
     }
 
+    private void CheckHoleList()
+    {
+        for (int holeId = 0; holeId < holeActiveList.Length; holeId++)
+        {
+            if (holeActiveList[holeId]) return;
+        }
+
+        GameEnd();
+    }
+
     private void GameEnd()
     {
         Debug.LogWarning("Game End / You Score : " + _playerScore);
@@ -103,6 +113,7 @@ public class SceneController : MonoBehaviour
     {
         if (isWin) holeActiveList[holeId] = false;
         ReactivatePlayer();
+        CheckHoleList();
     }
 
     public void ReactivatePlayer()

@@ -38,6 +38,7 @@ public class SceneController : MonoBehaviour
 
     private bool _isPlayGame;
     private float _playerScore;
+    private Vector2 _playerStartPosition;
 
     #endregion
 
@@ -49,6 +50,7 @@ public class SceneController : MonoBehaviour
         _playerScore = 0;
         holeActiveList = new bool[holeColors.Length];
 
+        _playerStartPosition = _player.gameObject.transform.position;
         _player.color = holeColors[Random.Range(0, holeColors.Length)];
         GenerateWorld();
         StartCoroutine(UpdateTimeUI());
@@ -73,7 +75,7 @@ public class SceneController : MonoBehaviour
 
     private void GameEnd()
     {
-        Debug.LogError("Game End / You Score : " + _playerScore);
+        Debug.LogWarning("Game End / You Score : " + _playerScore);
 
         _isPlayGame = false;
 
@@ -100,7 +102,14 @@ public class SceneController : MonoBehaviour
     public void ReactivatePlayer(int holeId, bool isWin)
     {
         if (isWin) holeActiveList[holeId] = false;
+        ReactivatePlayer();
+    }
+
+    public void ReactivatePlayer()
+    {
         _player.color = GetNewPlayerColor();
+        _player.gameObject.GetComponent<Rigidbody2D>().position = _playerStartPosition;
+        _player.gameObject.transform.position = _playerStartPosition;
     }
 
     public Color GetNewPlayerColor()

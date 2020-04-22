@@ -108,8 +108,9 @@ public class SceneController : MonoBehaviour
     public void ReactivatePlayer()
     {
         _player.color = GetNewPlayerColor();
-        _player.gameObject.GetComponent<Rigidbody2D>().position = _playerStartPosition;
+        _player.gameObject.GetComponent<Rigidbody2D>().Sleep();
         _player.gameObject.transform.position = _playerStartPosition;
+        _player.gameObject.GetComponent<Rigidbody2D>().WakeUp();
     }
 
     public Color GetNewPlayerColor()

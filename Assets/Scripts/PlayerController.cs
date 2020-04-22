@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            _rigidbody.AddForce(Input.mousePosition - _mouseCoord);
+            _rigidbody.AddForce((Input.mousePosition - _mouseCoord) / 2);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,7 +10,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         if (Input.GetMouseButtonDown(0)) _mouseCoord = Input.mousePosition;
-
         if (Input.GetMouseButtonUp(0)) _rigidbody.AddForce((Input.mousePosition - _mouseCoord) / 2);
     }
 }

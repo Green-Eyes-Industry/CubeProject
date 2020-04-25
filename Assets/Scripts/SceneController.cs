@@ -37,8 +37,11 @@ public class SceneController : MonoBehaviour
 
     #region PRIVATE
 
+    private int _playerKillCount;
     private bool _isPlayGame;
     private float _playerScore;
+    private float _tempTimeForMatch;
+    private float _timeWinRange;
     private Vector2 _playerStartPosition;
 
     #endregion
@@ -47,13 +50,9 @@ public class SceneController : MonoBehaviour
 
     private void Start()
     {
-        _isPlayGame = true;
         _playerScore = 0;
-        holeActiveList = new bool[holeColors.Length];
-
-        _playerStartPosition = _player.gameObject.transform.position;
-        _player.color = holeColors[Random.Range(0, holeColors.Length)];
-        GenerateWorld();
+        _tempTimeForMatch = _timeForMatch;
+        StartCoroutine(GenerateWorld());
         StartCoroutine(UpdateTimeUI());
     }
 
@@ -62,8 +61,20 @@ public class SceneController : MonoBehaviour
         if (_isPlayGame) ruleteObj.transform.Rotate(new Vector3(0, 0, 1), _ruleteSpeed);
     }
 
-    private void GenerateWorld()
+    public IEnumerator GenerateWorld()
     {
+        yield return new WaitForSecondsRealtime(0.3f);
+        _isPlayGame = true;
+
+        holeActiveList = new bool[holeColors.Length];
+
+        _playerStartPosition = _player.gameObject.transform.position;
+        _player.color = holeColors[Random.Range(0, holeColors.Length)];
+
+        _timeForMatch = _tempTimeForMatch;
+        _timeWinRange = _timeForMatch;
+        _playerKillCount = 1;
+
         for (int holeId = 0; holeId < ruleteObj.transform.childCount; holeId++)
         {
             holeActiveList[holeId] = true;
@@ -78,15 +89,24 @@ public class SceneController : MonoBehaviour
         _timeForMatch = 0;
     }
 
+    public void AddScore()
+    {
+        _playerScore += (5 + (_timeWinRange - _timeForMatch)) * _scoreModifide;
+        _timeWinRange = _timeForMatch;
+        _playerKillCount += 1;
+
+        _scoreText.text = "Score : " + _playerScore;
+        
+        if (holeActiveList.Length < _playerKillCount)
+        {
+            GetComponent<LevelGenerator>().NextLevel(ref _scoreModifide);
+            _ruleteSpeed *= 1.1f;
+        }
+    }
+
     private void GameEnd()
     {
-        Debug.LogWarning("Game End / You Score : " + _playerScore);
-
         _isPlayGame = false;
-
-        for (int holeId = 0; holeId < ruleteObj.transform.childCount; holeId++)
-            if (!ruleteObj.transform.GetChild(holeId).GetComponent<HoleController>().isActive) _playerScore += 1 * _scoreModifide;
-
         _scoreText.text = "Score : " + _playerScore;
     }
 

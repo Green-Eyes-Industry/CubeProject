@@ -16,6 +16,7 @@ public class HoleController : MonoBehaviour
         thisColor = holeColor;
         GetComponent<Image>().color = holeColor;
         _sceneController = sceneController;
+        EnableHole(true);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -28,12 +29,18 @@ public class HoleController : MonoBehaviour
     public void DisableHole(bool isWin)
     {
         _sceneController.ReactivatePlayer(_holeId, isWin);
-
+        
         if (isWin)
         {
-            isActive = false;
-            GetComponent<CircleCollider2D>().enabled = false;
-            GetComponent<Image>().enabled = false;
+            EnableHole(false);
+            _sceneController.AddScore();
         }
+    }
+
+    public void EnableHole(bool isEnable)
+    {
+        isActive = isEnable;
+        GetComponent<CircleCollider2D>().enabled = isEnable;
+        GetComponent<Image>().enabled = isEnable;
     }
 }

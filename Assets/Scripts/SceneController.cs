@@ -34,11 +34,11 @@ public class SceneController : MonoBehaviour
     };
 
     [HideInInspector] public bool[] holeActiveList;
+    [HideInInspector] public bool isPlayGame;
 
     #region PRIVATE
 
     private int _playerKillCount;
-    private bool _isPlayGame;
     private float _playerScore;
     private float _tempTimeForMatch;
     private float _timeWinRange;
@@ -53,19 +53,21 @@ public class SceneController : MonoBehaviour
         _playerScore = 0;
         _tempTimeForMatch = _timeForMatch;
         StartCoroutine(GenerateWorld());
-        StartCoroutine(UpdateTimeUI());
+        StartCoroutine(StartTimer());
     }
 
     private void Update()
     {
-        if (_isPlayGame) ruleteObj.transform.Rotate(new Vector3(0, 0, 1), _ruleteSpeed);
+        if (isPlayGame) ruleteObj.transform.Rotate(new Vector3(0, 0, 1), _ruleteSpeed);
     }
 
     public IEnumerator GenerateWorld()
     {
-        yield return new WaitForSecondsRealtime(0.3f);
-        _isPlayGame = true;
-
+        
+        ruleteObj.GetComponent<Animation>().Play();
+        yield return new WaitForSecondsRealtime(0.15f);
+        StopAllCoroutines();
+        isPlayGame = true;
         holeActiveList = new bool[holeColors.Length];
 
         _playerStartPosition = _player.gameObject.transform.position;
@@ -80,6 +82,7 @@ public class SceneController : MonoBehaviour
             holeActiveList[holeId] = true;
             ruleteObj.transform.GetChild(holeId).GetComponent<HoleController>().CreateHole(holeId, holeColors[holeId], this);
         }
+        StartCoroutine(StartTimer());
     }
 
     private void CheckHoleList()
@@ -106,11 +109,11 @@ public class SceneController : MonoBehaviour
 
     private void GameEnd()
     {
-        _isPlayGame = false;
+        isPlayGame = false;
         _scoreText.text = "Score : " + _playerScore;
     }
 
-    private IEnumerator UpdateTimeUI()
+    private IEnumerator StartTimer()
     {
         while (_timeForMatch > 0)
         {
@@ -132,23 +135,27 @@ public class SceneController : MonoBehaviour
 
     public void ReactivatePlayer()
     {
-        _player.color = GetNewPlayerColor();
+        StartCoroutine(GetNewPlayerColor());
         _player.gameObject.GetComponent<Rigidbody2D>().Sleep();
         _player.gameObject.transform.position = _playerStartPosition;
         _player.gameObject.GetComponent<Rigidbody2D>().WakeUp();
     }
 
-    public Color GetNewPlayerColor()
+    public IEnumerator GetNewPlayerColor()
     {
-        for (int colorId = 0; colorId < holeColors.Length; colorId++)
+        Color newColor = Color.white;
+        _player.GetComponent<Animation>().Play();
+        yield return new WaitForSecondsRealtime(0.2f);
+        for (int colorId = 0; colorId < ruleteObj.transform.childCount; colorId++)
         {
-            if (holeActiveList[colorId])
+            if (ruleteObj.transform.GetChild(colorId).GetComponent<HoleController>().isActive)
             {
-                return holeColors[colorId];
+                newColor = holeColors[colorId];
+                break;
             }
         }
 
-        return Color.white;
+        _player.color = newColor;
     }
 
     #endregion

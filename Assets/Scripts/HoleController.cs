@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class HoleController : MonoBehaviour
 {
     [HideInInspector] public bool isActive;
     [HideInInspector] public Color thisColor;
-
+    
     private int _holeId;
     private SceneController _sceneController;
 
@@ -16,7 +17,8 @@ public class HoleController : MonoBehaviour
         thisColor = holeColor;
         GetComponent<Image>().color = holeColor;
         _sceneController = sceneController;
-        EnableHole(true);
+        transform.localScale = Vector3.one * 0.7f;
+        StartCoroutine(EnableHole(true));
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -32,15 +34,21 @@ public class HoleController : MonoBehaviour
         
         if (isWin)
         {
-            EnableHole(false);
+            StartCoroutine(EnableHole(false));
             _sceneController.AddScore();
         }
     }
 
-    public void EnableHole(bool isEnable)
+    public IEnumerator EnableHole(bool isEnable)
     {
+        if (!isEnable && !isActive)
+        {
+            GetComponent<Animation>().Play();
+            yield return new WaitForSecondsRealtime(0.15f);
+        }
         isActive = isEnable;
         GetComponent<CircleCollider2D>().enabled = isEnable;
         GetComponent<Image>().enabled = isEnable;
+        yield return new WaitForSecondsRealtime(0.05f);
     }
 }

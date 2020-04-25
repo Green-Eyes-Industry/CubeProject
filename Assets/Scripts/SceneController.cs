@@ -17,6 +17,7 @@ public class SceneController : MonoBehaviour
     [SerializeField] private float _timeForMatch;
     [SerializeField] private float _ruleteSpeed;
     [SerializeField] private float _scoreModifide;
+    [SerializeField] private int _level;
 
     #endregion
 
@@ -58,10 +59,7 @@ public class SceneController : MonoBehaviour
 
     private void Update()
     {
-        if (_isPlayGame)
-        {
-            ruleteObj.transform.Rotate(new Vector3(0, 0, 1), _ruleteSpeed);
-        }
+        if (_isPlayGame) ruleteObj.transform.Rotate(new Vector3(0, 0, 1), _ruleteSpeed);
     }
 
     private void GenerateWorld()
@@ -75,12 +73,9 @@ public class SceneController : MonoBehaviour
 
     private void CheckHoleList()
     {
-        for (int holeId = 0; holeId < holeActiveList.Length; holeId++)
-        {
-            if (holeActiveList[holeId]) return;
-        }
+        for (int holeId = 0; holeId < holeActiveList.Length; holeId++) if (holeActiveList[holeId]) return;
 
-        GameEnd();
+        _timeForMatch = 0;
     }
 
     private void GameEnd()
@@ -90,9 +85,7 @@ public class SceneController : MonoBehaviour
         _isPlayGame = false;
 
         for (int holeId = 0; holeId < ruleteObj.transform.childCount; holeId++)
-        {
             if (!ruleteObj.transform.GetChild(holeId).GetComponent<HoleController>().isActive) _playerScore += 1 * _scoreModifide;
-        }
 
         _scoreText.text = "Score : " + _playerScore;
     }
@@ -106,6 +99,7 @@ public class SceneController : MonoBehaviour
             _timeForMatch -= 1;
         }
 
+        _timerText.text = "Timer : " + ((_timeForMatch < 0) ? 0 : _timeForMatch);
         GameEnd();
     }
 

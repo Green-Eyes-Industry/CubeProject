@@ -1,2 +1,2 @@
 # CubeProject
-Game
+Small game for android
